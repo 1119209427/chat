@@ -15,13 +15,12 @@ import (
 const (
 	USERNAME = "root"
 	PASSWORD = "123456"
-	HOST = "127.0.0.1"
-	PORT = "3306"
-	DBNAME = "moive"
+	HOST     = "127.0.0.1"
+	PORT     = "3306"
+	DBNAME   = "moive"
 )
 
 var DB *sql.DB
-
 
 type MovieData struct {
 	Title    string `json:"title"`
@@ -32,7 +31,6 @@ type MovieData struct {
 	Score    string `json:"score"`
 	Quote    string `json:"quote"`
 }
-
 
 func main() {
 	InitDB()
@@ -48,7 +46,7 @@ func main() {
 	}
 }
 
-func Spider(page string,ch chan bool) {
+func Spider(page string, ch chan bool) {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://movie.douban.com/top250?start="+page, nil)
 	if err != nil {
@@ -99,12 +97,12 @@ func Spider(page string,ch chan bool) {
 				InsertSql(movieData)
 			}
 		})
-	if ch != nil{
+	if ch != nil {
 		ch <- true
 	}
 }
 
-func InfoSpite(info string) (director ,actor , year string) {
+func InfoSpite(info string) (director, actor, year string) {
 	directorRe, _ := regexp.Compile(`导演:(.*)主演:`)
 	if len(director) < 8 {
 		director = string(directorRe.Find([]byte(info)))
@@ -123,13 +121,13 @@ func InfoSpite(info string) (director ,actor , year string) {
 	return
 }
 
-func InitDB(){
-	path := strings.Join([]string{USERNAME, ":", PASSWORD, "@tcp(",HOST, ":", PORT, ")/", DBNAME, "?charset=utf8"}, "")
+func InitDB() {
+	path := strings.Join([]string{USERNAME, ":", PASSWORD, "@tcp(", HOST, ":", PORT, ")/", DBNAME, "?charset=utf8"}, "")
 	DB, _ = sql.Open("mysql", path)
 	DB.SetConnMaxLifetime(10)
 	DB.SetMaxIdleConns(5)
-	if err := DB.Ping(); err != nil{
-		fmt.Println("opon database fail",err)
+	if err := DB.Ping(); err != nil {
+		fmt.Println("opon database fail", err)
 		return
 	}
 	fmt.Println("connnect success")
