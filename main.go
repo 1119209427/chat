@@ -152,3 +152,22 @@ func InsertSql(movieData MovieData) bool {
 	_ = tx.Commit()
 	return true
 }
+func InsertSql1(movieData MovieData) bool {
+	tx, err := DB.Begin()
+	if err != nil {
+		fmt.Println("tx fail")
+		return false
+	}
+	stmt, err := tx.Prepare("INSERT INTO movie_data (`Title`,`Director`,`Picture`,`Actor`,`Year`,`Score`,`Quote`) VALUES (?, ?, ?,?,?,?,?)")
+	if err != nil {
+		fmt.Println("Prepare fail", err)
+		return false
+	}
+	_, err = stmt.Exec(movieData.Title, movieData.Director, movieData.Picture, movieData.Actor, movieData.Year, movieData.Score, movieData.Quote)
+	if err != nil {
+		fmt.Println("Exec fail", err)
+		return false
+	}
+	_ = tx.Commit()
+	return true
+}
